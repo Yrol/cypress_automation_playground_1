@@ -20,7 +20,7 @@ describe('Accessing NAB website', () => {
         cy.get('.nab-header-bar__header .nab-header-bar__search-container input[type=search]').type('home loan{enter}')
     })
 
-    it('will count the search items', () => {
+    it('will count the search items of the first tab', () => {
 
         // Getting the results count of the first tab and if > 10 do an item count
         cy.get('.tabs-navigation-container > ul > li').first().then(($listItem) => {
@@ -30,8 +30,13 @@ describe('Accessing NAB website', () => {
             cy.wrap($listItem).find('.item-count').then(($span) => {
                 const $resultCount = $span.text()
                 
+                // const $searchResults = cy.get('.search-results-container .search-result-container')
+                const $searchResults = cy.get('.search-results-container').find('.search-result-container');
+                
                 if(parseInt($resultCount) >= 10) {
-                    cy.get('.search-results-container .search-result-container').should('have.length', 10)
+                    $searchResults.should('have.length', 10)
+                } else {
+                    $searchResults.should('be.lt', 10)
                 }
             })
         })
