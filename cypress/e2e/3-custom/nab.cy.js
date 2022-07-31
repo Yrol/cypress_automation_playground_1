@@ -1,7 +1,5 @@
 /// <reference types="cypress" />
 
-import { should } from "chai";
-
 /**
  * Custom written test cases for NAB
  */
@@ -54,5 +52,31 @@ describe('Accessing NAB website', () => {
                 }
             })
         })
+    })
+
+    it('will scan for each title of the search results and see at least one matches partially or full', () => {
+        
+        const $searchTerm = 'home loan'
+
+        cy.get('.nab-header-bar__search > .nab-button-icon--white > .nab-button').click()
+        cy.get('.nab-header-bar__header .nab-header-bar__search-container input[type=search]').type($searchTerm).type('{enter}')
+
+        const $searchResults = cy.get('.search-results-container').find('.search-result-container');
+
+        /**
+         * Method 1: by iterating over each element using "each". 
+         * Note: need to use 'return false' when the first result is found in order to break out of "each" loop since further execution could result in DOM not found error.
+         */
+        $searchResults.each(($el, $index, $list) => {
+            const $searchResultBlock = $el.find('.search-result-heading')
+            const $elementHeaderText =  $searchResultBlock.text()
+            if($elementHeaderText.includes($searchTerm)){
+                cy.wrap($el).find('.search-result-heading').click()
+                return false;
+            }
+        })
+
+        //Method 2: without using iteration
+        // $searchResults.get('a').contains($searchTerm).click()
     })
 });
